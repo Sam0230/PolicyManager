@@ -1,0 +1,4 @@
+if [ "$(dirname "$program")" == "/etc/authorized_actions" ]; then
+	echo "y"
+fi
+# This policy script allows all programs under /etc/authorized_actions run with root privilege and keeps the HOME and USER variable.

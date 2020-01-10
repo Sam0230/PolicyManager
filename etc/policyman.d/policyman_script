@@ -1,0 +1,68 @@
+export PATH="/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
+CFGDIR=/etc/policyman.d
+result=no
+program="$(realpath -s "$(which "$1")" 2>/dev/null)"
+if [ "$program" == "" ]; then
+	echo "Invalid program."
+	exit -1
+fi
+args=("$@")
+unset args[0]
+unset args[1]
+args=("${args[@]}")
+username="$(cat /etc/passwd | grep '^[1234567890\-qwertyuiopasdfghjklzxcvbnmQWERTYUIOPASDFGHJKLZXCVBNM]*:[x\*]:'$calleruid':')"
+env_keep_a892e16a791b46ae8e5ebde21453adc16fa20fac71e24e3681c46ce688637325=""
+for i in "$CFGDIR/policies/*"; do
+	subresult="$( (source $i) )"
+	if [ "${subresult:0:1}" == "y" ]; then
+		result=yes
+		env_keep_a892e16a791b46ae8e5ebde21453adc16fa20fac71e24e3681c46ce688637325=("${env_keep_a892e16a791b46ae8e5ebde21453adc16fa20fac71e24e3681c46ce688637325[@]}" ${subresult:1})
+	fi
+	if [ "${subresult:0:1}" == "a" -a "0" == "1" ]; then
+		if [ "$result" != "y" ]; then
+			result=auth
+		fi
+		env_keep_a892e16a791b46ae8e5ebde21453adc16fa20fac71e24e3681c46ce688637325=("${env_keep_a892e16a791b46ae8e5ebde21453adc16fa20fac71e24e3681c46ce688637325[@]}" ${subresult:1})
+	fi
+done
+if [ "$result" == "no" ]; then
+	echo "PolicyMan: Permissions denied."
+	exit -2
+fi
+if [ "$result" == "auth" ]; then
+	echo -n "[PolicyMan] Password: "
+	password="$("$(cat "$CFGDIR/policies_askpass")")"
+	echo ''
+	if [ "1" == "2" ]; then
+		result="yes"
+	else
+		echo "PolicyMan: Incorrect password."
+		exit -3
+	fi
+fi
+if [ "$result" == "yes" ]; then
+	unset calleruid
+	unset CFGDIR
+	unset result
+	unset program
+	unset args
+	unset username
+	IFS=$'\n'
+	env_a892e16a791b46ae8e5ebde21453adc16fa20fac71e24e3681c46ce688637325=($(export))
+	for i_a892e16a791b46ae8e5ebde21453adc16fa20fac71e24e3681c46ce688637325 in ${env_a892e16a791b46ae8e5ebde21453adc16fa20fac71e24e3681c46ce688637325[@]}; do
+		i_a892e16a791b46ae8e5ebde21453adc16fa20fac71e24e3681c46ce688637325="${i_a892e16a791b46ae8e5ebde21453adc16fa20fac71e24e3681c46ce688637325:11}"
+		j_a892e16a791b46ae8e5ebde21453adc16fa20fac71e24e3681c46ce688637325="${i_a892e16a791b46ae8e5ebde21453adc16fa20fac71e24e3681c46ce688637325%%=*}"
+		for k_a892e16a791b46ae8e5ebde21453adc16fa20fac71e24e3681c46ce688637325 in ${env_keep_a892e16a791b46ae8e5ebde21453adc16fa20fac71e24e3681c46ce688637325[@]}; do
+			if [ "${j_a892e16a791b46ae8e5ebde21453adc16fa20fac71e24e3681c46ce688637325:7}" == "$k_a892e16a791b46ae8e5ebde21453adc16fa20fac71e24e3681c46ce688637325" ]; then
+				declare -x "${i_a892e16a791b46ae8e5ebde21453adc16fa20fac71e24e3681c46ce688637325:7}"
+			fi
+		done
+		unset "$j_a892e16a791b46ae8e5ebde21453adc16fa20fac71e24e3681c46ce688637325"
+	done
+	unset env_keep_a892e16a791b46ae8e5ebde21453adc16fa20fac71e24e3681c46ce688637325
+	unset env_a892e16a791b46ae8e5ebde21453adc16fa20fac71e24e3681c46ce688637325
+	unset i_a892e16a791b46ae8e5ebde21453adc16fa20fac71e24e3681c46ce688637325
+	unset j_a892e16a791b46ae8e5ebde21453adc16fa20fac71e24e3681c46ce688637325
+	unset k_a892e16a791b46ae8e5ebde21453adc16fa20fac71e24e3681c46ce688637325
+	exec "$1" "${args[@]}"
+fi
