@@ -15,6 +15,7 @@ END
 The policy scripts are in /etc/policyman.d/policies, and all policy scripts are Bash scripts.
 #### How to write policies
 Here are two examples.
+
 The first example (/etc/policyman.d/policies/example_policy):
 ``` bash
 # Avaliable variables
