@@ -13,7 +13,7 @@ END
 ```
 ### Usage
 The policy scripts are in /etc/policyman.d/policies, and all policy scripts are Bash scripts.
-##### How to write policies
+#### How to write policies
 The first example (/etc/policyman.d/policies/example/example_policy):
 ``` bash
 # Avaliable variables
