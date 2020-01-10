@@ -12,19 +12,22 @@ unset args[1]
 args=("${args[@]}")
 username="$(cat /etc/passwd | grep '^[1234567890\-qwertyuiopasdfghjklzxcvbnmQWERTYUIOPASDFGHJKLZXCVBNM]*:[x\*]:'$calleruid':')"
 env_keep_a892e16a791b46ae8e5ebde21453adc16fa20fac71e24e3681c46ce688637325=""
-for i in "$CFGDIR/policies/*"; do
+IFS=$'\n'
+for i in $CFGDIR/policies/*; do
 	subresult="$( (source $i) )"
 	if [ "${subresult:0:1}" == "y" ]; then
 		result=yes
-		env_keep_a892e16a791b46ae8e5ebde21453adc16fa20fac71e24e3681c46ce688637325=("${env_keep_a892e16a791b46ae8e5ebde21453adc16fa20fac71e24e3681c46ce688637325[@]}" ${subresult:1})
 	fi
 	if [ "${subresult:0:1}" == "a" -a "0" == "1" ]; then
 		if [ "$result" != "y" ]; then
 			result=auth
 		fi
-		env_keep_a892e16a791b46ae8e5ebde21453adc16fa20fac71e24e3681c46ce688637325=("${env_keep_a892e16a791b46ae8e5ebde21453adc16fa20fac71e24e3681c46ce688637325[@]}" ${subresult:1})
 	fi
+	IFS=$' \t\n'
+	env_keep_a892e16a791b46ae8e5ebde21453adc16fa20fac71e24e3681c46ce688637325=("${env_keep_a892e16a791b46ae8e5ebde21453adc16fa20fac71e24e3681c46ce688637325[@]}" ${subresult:2})
+	IFS=$'\n'
 done
+IFS=$' \t\n'
 if [ "$result" == "no" ]; then
 	echo "PolicyMan: Permissions denied."
 	exit -2
@@ -47,6 +50,7 @@ if [ "$result" == "yes" ]; then
 	unset program
 	unset args
 	unset username
+	unset subresult
 	IFS=$'\n'
 	env_a892e16a791b46ae8e5ebde21453adc16fa20fac71e24e3681c46ce688637325=($(export))
 	for i_a892e16a791b46ae8e5ebde21453adc16fa20fac71e24e3681c46ce688637325 in ${env_a892e16a791b46ae8e5ebde21453adc16fa20fac71e24e3681c46ce688637325[@]}; do
@@ -54,11 +58,12 @@ if [ "$result" == "yes" ]; then
 		j_a892e16a791b46ae8e5ebde21453adc16fa20fac71e24e3681c46ce688637325="${i_a892e16a791b46ae8e5ebde21453adc16fa20fac71e24e3681c46ce688637325%%=*}"
 		for k_a892e16a791b46ae8e5ebde21453adc16fa20fac71e24e3681c46ce688637325 in ${env_keep_a892e16a791b46ae8e5ebde21453adc16fa20fac71e24e3681c46ce688637325[@]}; do
 			if [ "${j_a892e16a791b46ae8e5ebde21453adc16fa20fac71e24e3681c46ce688637325:7}" == "$k_a892e16a791b46ae8e5ebde21453adc16fa20fac71e24e3681c46ce688637325" ]; then
-				declare -x "${i_a892e16a791b46ae8e5ebde21453adc16fa20fac71e24e3681c46ce688637325:7}"
+				eval export "${i_a892e16a791b46ae8e5ebde21453adc16fa20fac71e24e3681c46ce688637325:7}"
 			fi
 		done
 		unset "$j_a892e16a791b46ae8e5ebde21453adc16fa20fac71e24e3681c46ce688637325"
 	done
+	export PATH="/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
 	unset env_keep_a892e16a791b46ae8e5ebde21453adc16fa20fac71e24e3681c46ce688637325
 	unset env_a892e16a791b46ae8e5ebde21453adc16fa20fac71e24e3681c46ce688637325
 	unset i_a892e16a791b46ae8e5ebde21453adc16fa20fac71e24e3681c46ce688637325
